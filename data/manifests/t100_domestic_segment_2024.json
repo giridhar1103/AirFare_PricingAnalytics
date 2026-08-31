@@ -1,0 +1,34 @@
+{
+  "source_name": "T-100 Domestic Segment U.S. Carriers",
+  "source_period": "2024",
+  "source_url": "https://transtats.bts.gov/DL_SelectFields.aspx?QO_fu146_anzr=&gnoyr_VQ=FIM",
+  "downloaded_at_utc": "2026-08-30T21:11:15Z",
+  "sha256": "1f0b3454006da4e8cf5b1815392cee7d0ca8b9fe5e07e01396f34993098d36e8",
+  "byte_count": 5651291,
+  "archive_members": [
+    "T_T100D_SEGMENT_US_CARRIER_ONLY.csv"
+  ],
+  "uncompressed_csv_bytes": 48521670,
+  "selected_fields": [
+    "DEPARTURES_SCHEDULED",
+    "DEPARTURES_PERFORMED",
+    "SEATS",
+    "PASSENGERS",
+    "DISTANCE",
+    "UNIQUE_CARRIER",
+    "AIRLINE_ID",
+    "CARRIER_NAME",
+    "ORIGIN_AIRPORT_ID",
+    "ORIGIN_CITY_MARKET_ID",
+    "ORIGIN",
+    "DEST_AIRPORT_ID",
+    "DEST_CITY_MARKET_ID",
+    "DEST",
+    "YEAR",
+    "QUARTER",
+    "MONTH",
+    "DISTANCE_GROUP",
+    "CLASS"
+  ],
+  "schema_status": "header_verified"
+}

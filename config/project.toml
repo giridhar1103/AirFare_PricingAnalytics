@@ -1,0 +1,21 @@
+[project]
+name = "FareLab"
+market = "United States domestic scheduled passenger aviation"
+public_base_path = "/farelab/"
+production_data_mode = "dot_observed"
+
+[model]
+historical_start_year = 2017
+historical_end_period = "2025Q2"
+excluded_baseline_years = [2020, 2021]
+minimum_periods = 12
+minimum_distinct_fares = 8
+fare_change_min = -0.15
+fare_change_max = 0.15
+capacity_change_min = -0.20
+capacity_change_max = 0.20
+
+[artifacts]
+maximum_overview_bytes = 500000
+maximum_market_detail_bytes = 1500000
+schema_version = "2.0.0"

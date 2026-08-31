@@ -1,0 +1,14 @@
+{
+  "source_name": "DB1B Market",
+  "source_period": "2021Q4",
+  "source_url": "https://www.transtats.bts.gov/PREZIP/Origin_and_Destination_Survey_DB1BMarket_2021_4.zip",
+  "downloaded_at_utc": "2026-08-30T21:35:11.952722Z",
+  "sha256": "6d4576453a44a46a407b9bd04e602e071509b34bf8cb5cc39922916c0385e3eb",
+  "byte_count": 93528117,
+  "archive_members": [
+    "Origin_and_Destination_Survey_DB1BMarket_2021_4.csv",
+    "readme.html"
+  ],
+  "uncompressed_csv_bytes": 1749562560,
+  "schema_status": "header_verified"
+}

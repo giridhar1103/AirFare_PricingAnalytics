@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0.0",
+  "warehouse": "farelab_panel.duckdb",
+  "source_manifest_rows": 43,
+  "source_manifest_csv_sha256": "6de908da013955f4a764da16e05c9106fff298eb8b1a4bcb0d2b880ab4448728",
+  "digest_contract": "CSV header and rows ordered by source_name and source_period",
+  "sources": [
+    {
+      "source_name": "DB1B Market",
+      "file_count": 34,
+      "byte_count": 3000826879,
+      "row_count": 220847178,
+      "first_period": "2017Q1",
+      "last_period": "2025Q2",
+      "first_loaded_at_utc": "2026-08-30T21:23:35.982185Z",
+      "last_loaded_at_utc": "2026-08-30T21:43:01.126722Z"
+    },
+    {
+      "source_name": "T-100 Domestic Segment U.S. Carriers",
+      "file_count": 9,
+      "byte_count": 46149364,
+      "row_count": 2662620,
+      "first_period": "2017",
+      "last_period": "2025",
+      "first_loaded_at_utc": "2026-08-30T21:43:23.547623Z",
+      "last_loaded_at_utc": "2026-08-30T21:46:12.798578Z"
+    }
+  ]
+}

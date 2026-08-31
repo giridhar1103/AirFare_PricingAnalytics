@@ -1,0 +1,22 @@
+[db1b]
+publisher = "Bureau of Transportation Statistics"
+cadence = "quarterly"
+sample_rate = 0.10
+active_through = "2025Q2"
+landing_page = "https://www.transtats.bts.gov/"
+bulk_directory = "https://www.transtats.bts.gov/PREZIP/"
+file_pattern = "Origin_and_Destination_Survey_DB1BMarket_{year}_{quarter}.zip"
+
+[db1c]
+publisher = "Bureau of Transportation Statistics"
+cadence = "monthly"
+sample_rate = 0.40
+active_from = "2025-07"
+landing_page = "https://www.bts.gov/topics/airlines-and-airports/origin-and-destination-survey-data-market"
+
+[t100]
+publisher = "Bureau of Transportation Statistics"
+cadence = "monthly"
+landing_page = "https://www.transtats.bts.gov/DatabaseInfo.asp?QO_VQ=EEE"
+table = "T-100 Domestic Segment (U.S. Carriers)"
+download_form = "https://transtats.bts.gov/DL_SelectFields.aspx?QO_fu146_anzr=&gnoyr_VQ=FIM"
