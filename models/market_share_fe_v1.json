@@ -1,0 +1,24 @@
+{
+  "model_version": "market-share-fe-v1",
+  "built_at_utc": "2026-08-30T23:58:31.555468Z",
+  "model_type": "Entity and route-period fixed-effects log-share regression",
+  "formula": "log(market_share) = beta_fare*log(fare) + beta_capacity*log(seats) + route-carrier effects + route-period effects + error",
+  "data_period": "2017Q1 to 2025Q2",
+  "excluded_years": [
+    2020,
+    2021
+  ],
+  "observations": 80872,
+  "entities": 3756,
+  "market_periods": 33507,
+  "r_squared_within": 0.7917388786114679,
+  "fare_coefficient": 0.027873262421416748,
+  "fare_std_error": 0.007190562766017567,
+  "fare_p_value": 0.0001061827881623234,
+  "fare_confidence_low": 0.013779627194815028,
+  "fare_confidence_high": 0.04196689764801847,
+  "capacity_coefficient": 0.9910659693361745,
+  "capacity_std_error": 0.0014393164075393876,
+  "interpretation": "The fare coefficient measures the within-market association between a carrier's fare and passenger share after controlling for its seats, persistent route-carrier differences, and shocks shared by all carriers in the same route-period.",
+  "limitation": "The estimate remains observational. Time-varying schedule quality, product changes, and fare-setting responses to private demand information can still confound it."
+}

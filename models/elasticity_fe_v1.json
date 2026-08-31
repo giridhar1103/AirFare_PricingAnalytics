@@ -1,0 +1,57 @@
+{
+  "model_version": "elasticity-fe-v1",
+  "built_at_utc": "2026-08-30T23:56:12.177136Z",
+  "model_type": "Two-way fixed-effects log-log panel regression",
+  "formula": "log(passengers) = beta_price*log(fare) + beta_capacity*log(seats) + beta_competitor*log(competitor_fare) + entity effects + period effects + error",
+  "data_period": "2017Q1 to 2025Q2",
+  "excluded_years": [
+    2020,
+    2021
+  ],
+  "observations": 80872,
+  "entities": 3756,
+  "periods": 26,
+  "r_squared_within": 0.9740746929043311,
+  "covariance": "Entity-clustered standard errors with finite-sample debiasing",
+  "coefficients": [
+    {
+      "name": "log_fare",
+      "estimate": 0.05844993210466403,
+      "std_error": 0.005637350179664732,
+      "p_value": 0.0,
+      "confidence_low": 0.04740075530033962,
+      "confidence_high": 0.06949910890898844
+    },
+    {
+      "name": "log_seats",
+      "estimate": 0.9926679557480125,
+      "std_error": 0.0013525085898997864,
+      "p_value": 0.0,
+      "confidence_low": 0.9900170460008981,
+      "confidence_high": 0.9953188654951268
+    },
+    {
+      "name": "log_competitor_fare",
+      "estimate": 0.018014918242315544,
+      "std_error": 0.003918395669780121,
+      "p_value": 4.282188454718394e-06,
+      "confidence_low": 0.010334883267572391,
+      "confidence_high": 0.025694953217058697
+    }
+  ],
+  "filters": {
+    "minimum_model_periods": 12,
+    "minimum_distinct_rounded_fares": 8,
+    "minimum_relative_fare_range": 0.1,
+    "minimum_passengers": 100,
+    "minimum_seats": 100,
+    "fare_range_usd": [
+      50,
+      2000
+    ],
+    "requires_competitor_fare": true,
+    "accepted_quality_rows_only": true
+  },
+  "interpretation": "The fare coefficient is an observational own-price elasticity conditional on the included controls and fixed effects.",
+  "limitation": "Airlines set fares using demand information not observed in public DOT data. Fixed effects reduce confounding but do not establish a causal price effect."
+}

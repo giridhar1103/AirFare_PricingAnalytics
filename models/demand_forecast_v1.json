@@ -1,0 +1,142 @@
+{
+  "model_version": "conditional-demand-forecast-v1",
+  "built_at_utc": "2026-08-31T00:03:15.403104Z",
+  "task": "Conditional next-quarter route-carrier passenger forecast",
+  "data_period": "2018Q1 to 2025Q2",
+  "forecast_horizon": "One quarter",
+  "target": "T-100 scheduled passenger volume",
+  "features": [
+    "log_lag1_passengers",
+    "log_lag4_passengers",
+    "log_fare",
+    "log_seats",
+    "log_competitor_fare",
+    "lag1_load_factor",
+    "lag1_market_share",
+    "hhi",
+    "log_distance",
+    "quarter_sin",
+    "quarter_cos",
+    "trend",
+    "competitor_fare_missing",
+    "carrier_code"
+  ],
+  "validation": "Three expanding-window folds with later calendar periods held out",
+  "excluded_training_years": [
+    2020,
+    2021
+  ],
+  "folds": [
+    {
+      "fold": "2023",
+      "train_through": "2022Q4",
+      "test_periods": [
+        "2023Q1",
+        "2023Q2",
+        "2023Q3",
+        "2023Q4"
+      ],
+      "seasonal_naive": {
+        "mae": 4766.855876272265,
+        "wape": 0.17559338052974804,
+        "bias": -0.09090731321416548,
+        "observations": 25152
+      },
+      "ridge": {
+        "mae": 1609.5821915844801,
+        "wape": 0.05929106849394005,
+        "bias": 0.030269669271054882,
+        "observations": 25152
+      },
+      "gradient_boosting": {
+        "mae": 1469.0655494603736,
+        "wape": 0.05411495391198297,
+        "bias": 0.027113649699011214,
+        "observations": 25152
+      }
+    },
+    {
+      "fold": "2024",
+      "train_through": "2023Q4",
+      "test_periods": [
+        "2024Q1",
+        "2024Q2",
+        "2024Q3",
+        "2024Q4"
+      ],
+      "seasonal_naive": {
+        "mae": 3801.365295721228,
+        "wape": 0.1384286535775803,
+        "bias": -0.015870200110065163,
+        "observations": 25311
+      },
+      "ridge": {
+        "mae": 1302.1480357555859,
+        "wape": 0.04741838400830067,
+        "bias": 0.010148194733436701,
+        "observations": 25311
+      },
+      "gradient_boosting": {
+        "mae": 1243.1087938420476,
+        "wape": 0.04526843994069652,
+        "bias": 0.0032453933107721928,
+        "observations": 25311
+      }
+    },
+    {
+      "fold": "2025H1",
+      "train_through": "2024Q4",
+      "test_periods": [
+        "2025Q1",
+        "2025Q2"
+      ],
+      "seasonal_naive": {
+        "mae": 3769.581555681726,
+        "wape": 0.14209818258209173,
+        "bias": 0.04181358856362078,
+        "observations": 12329
+      },
+      "ridge": {
+        "mae": 1507.384897036886,
+        "wape": 0.056822395578041196,
+        "bias": 0.02882328783958092,
+        "observations": 12329
+      },
+      "gradient_boosting": {
+        "mae": 1503.0691143028334,
+        "wape": 0.05665970779058539,
+        "bias": 0.029556801958250084,
+        "observations": 12329
+      }
+    }
+  ],
+  "aggregate_seasonal_naive": {
+    "mae": 4181.862132118741,
+    "wape": 0.15401663963978895,
+    "bias": -0.03485597425068647,
+    "observations": 62792
+  },
+  "aggregate_ridge": {
+    "mae": 1465.5916137614704,
+    "wape": 0.053977268571843914,
+    "bias": 0.021789135376189105,
+    "observations": 62792
+  },
+  "aggregate_gradient_boosting": {
+    "mae": 1384.6605059753315,
+    "wape": 0.05099660185693444,
+    "bias": 0.01785178356854746,
+    "observations": 62792
+  },
+  "interval_calibration": {
+    "level": 0.8,
+    "method": "Out-of-fold symmetric absolute-log-error conformal interval",
+    "log_absolute_error_quantile": 0.0942109931540891,
+    "empirical_coverage": 0.7999904446426296,
+    "observations": 62792
+  },
+  "champion": "gradient_boosting",
+  "promotion_rule": "Promote ML only when aggregate WAPE improves on seasonal naive and absolute bias does not exceed 5%.",
+  "interpretation": "This is a conditional forecast using observed or analyst-supplied fare and capacity inputs. Changing an input does not make the resulting difference causal.",
+  "limitation": "The model does not observe booking curves, fare-class inventory, search demand, schedule quality, ancillary revenue, or route accounting cost."
+}

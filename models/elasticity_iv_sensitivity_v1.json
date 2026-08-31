@@ -1,0 +1,17 @@
+{
+  "model_version": "elasticity-iv-network-fare-sensitivity-v1",
+  "built_at_utc": "2026-08-30T23:59:31.616166Z",
+  "model_type": "Two-way absorbed 2SLS sensitivity",
+  "observations": 80872,
+  "entities": 3756,
+  "periods": 26,
+  "fare_estimate": 0.021356094548889138,
+  "fare_std_error": 0.010555488952521603,
+  "fare_confidence_low": 0.0006674067156382697,
+  "fare_confidence_high": 0.04204478238214,
+  "first_stage_partial_f": 1455.1685153710162,
+  "first_stage_partial_r_squared": 0.13499606973725364,
+  "instrument": "Passenger-weighted carrier fare on all other supported routes in the same quarter",
+  "exclusion_assumption": "After route-carrier effects, period effects, capacity, and competitor fare controls, the carrier's other-route fare affects focal-route passengers only through focal-route fare.",
+  "status": "research_only_nonnegative_sign"
+}
