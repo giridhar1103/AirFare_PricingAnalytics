@@ -1,6 +1,6 @@
 {
   "model_version": "conditional-demand-forecast-v1",
-  "built_at_utc": "2026-08-31T00:03:15.403104Z",
+  "built_at_utc": "2026-09-01T22:03:23.568314Z",
   "task": "Conditional next-quarter route-carrier passenger forecast",
   "data_period": "2018Q1 to 2025Q2",
   "forecast_horizon": "One quarter",
@@ -21,7 +21,7 @@
     "competitor_fare_missing",
     "carrier_code"
   ],
-  "validation": "Three expanding-window folds with later calendar periods held out",
+  "validation": "Three expanding-window folds with later calendar periods held out; interval width calibrated on 2023 and 2024 residuals and evaluated on 2025 H1",
   "excluded_training_years": [
     2020,
     2021
@@ -130,10 +130,15 @@
   },
   "interval_calibration": {
     "level": 0.8,
-    "method": "Out-of-fold symmetric absolute-log-error conformal interval",
-    "log_absolute_error_quantile": 0.0942109931540891,
-    "empirical_coverage": 0.7999904446426296,
-    "observations": 62792
+    "method": "Symmetric absolute-log-error interval calibrated on 2023 and 2024 out-of-fold residuals, evaluated on 2025 H1",
+    "log_absolute_error_quantile": 0.09146792548009408,
+    "empirical_coverage": 0.7482358666558521,
+    "observations": 12329,
+    "calibration_observations": 50463,
+    "evaluation_periods": [
+      "2025Q1",
+      "2025Q2"
+    ]
   },
   "champion": "gradient_boosting",
   "promotion_rule": "Promote ML only when aggregate WAPE improves on seasonal naive and absolute bias does not exceed 5%.",

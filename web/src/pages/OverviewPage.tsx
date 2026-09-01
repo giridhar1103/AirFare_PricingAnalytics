@@ -73,7 +73,7 @@ export function OverviewPage({ artifact }: { artifact: OverviewArtifact }) {
       <Panel
         title="Route opportunity queue"
         subtitle="Ranked by transparent fare, share, utilization, and conditional forecast rules"
-        actions={<span className="data-chip">2025 Q2 observed</span>}
+        actions={<span className="data-chip">60 market workflow sample</span>}
       >
         <div className="table-scroll">
           <table className="decision-table">

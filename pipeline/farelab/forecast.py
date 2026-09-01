@@ -17,7 +17,6 @@ from sklearn.linear_model import Ridge
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-
 MODEL_VERSION = "conditional-demand-forecast-v1"
 
 
@@ -102,6 +101,8 @@ class IntervalCalibration:
     log_absolute_error_quantile: float
     empirical_coverage: float
     observations: int
+    calibration_observations: int
+    evaluation_periods: list[str]
 
 
 @dataclass(frozen=True)
@@ -257,8 +258,7 @@ def backtest(
 
     for label, test_year, test_periods in fold_definitions:
         train = frame.loc[
-            (frame["service_year"] < test_year)
-            & (~frame["service_year"].isin([2020, 2021]))
+            (frame["service_year"] < test_year) & (~frame["service_year"].isin([2020, 2021]))
         ].copy()
         test = frame.loc[frame["period_key"].isin(test_periods)].copy()
         if train.empty or test.empty:
@@ -297,29 +297,29 @@ def backtest(
     aggregate_naive = _aggregate(actuals, naive_predictions)
     aggregate_ridge = _aggregate(actuals, ridge_predictions)
     aggregate_boosting = _aggregate(actuals, boosting_predictions)
-    combined_actual = np.concatenate(actuals)
-    combined_boosting = np.concatenate(boosting_predictions)
-    absolute_log_error = np.abs(
-        np.log1p(combined_actual) - np.log1p(combined_boosting)
-    )
+    calibration_actual = np.concatenate(actuals[:2])
+    calibration_boosting = np.concatenate(boosting_predictions[:2])
+    absolute_log_error = np.abs(np.log1p(calibration_actual) - np.log1p(calibration_boosting))
     interval_level = 0.80
-    interval_quantile = float(
-        np.quantile(absolute_log_error, interval_level, method="higher")
-    )
-    predicted_log = np.log1p(combined_boosting)
+    interval_quantile = float(np.quantile(absolute_log_error, interval_level, method="higher"))
+    evaluation_actual = actuals[2]
+    evaluation_boosting = boosting_predictions[2]
+    predicted_log = np.log1p(evaluation_boosting)
     interval_low = np.maximum(np.expm1(predicted_log - interval_quantile), 0)
     interval_high = np.maximum(np.expm1(predicted_log + interval_quantile), 0)
     interval_calibration = IntervalCalibration(
         level=interval_level,
-        method="Out-of-fold symmetric absolute-log-error conformal interval",
+        method=(
+            "Symmetric absolute-log-error interval calibrated on 2023 and 2024 "
+            "out-of-fold residuals, evaluated on 2025 H1"
+        ),
         log_absolute_error_quantile=interval_quantile,
         empirical_coverage=float(
-            np.mean(
-                (combined_actual >= interval_low)
-                & (combined_actual <= interval_high)
-            )
+            np.mean((evaluation_actual >= interval_low) & (evaluation_actual <= interval_high))
         ),
-        observations=int(len(combined_actual)),
+        observations=int(len(evaluation_actual)),
+        calibration_observations=int(len(calibration_actual)),
+        evaluation_periods=["2025Q1", "2025Q2"],
     )
     candidates = {
         "seasonal_naive": aggregate_naive,
@@ -345,7 +345,10 @@ def backtest(
         forecast_horizon="One quarter",
         target="T-100 scheduled passenger volume",
         features=ALL_FEATURES,
-        validation="Three expanding-window folds with later calendar periods held out",
+        validation=(
+            "Three expanding-window folds with later calendar periods held out; interval width "
+            "calibrated on 2023 and 2024 residuals and evaluated on 2025 H1"
+        ),
         excluded_training_years=[2020, 2021],
         folds=folds,
         aggregate_seasonal_naive=aggregate_naive,
@@ -393,9 +396,13 @@ def run(database: Path, output: Path, model_output: Path) -> ForecastModelCard:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Backtest and train FareLab's demand forecast")
-    parser.add_argument("--database", type=Path, default=Path("data/processed/farelab_panel.duckdb"))
+    parser.add_argument(
+        "--database", type=Path, default=Path("data/processed/farelab_panel.duckdb")
+    )
     parser.add_argument("--output", type=Path, default=Path("models/demand_forecast_v1.json"))
-    parser.add_argument("--model-output", type=Path, default=Path("models/demand_forecast_v1.joblib"))
+    parser.add_argument(
+        "--model-output", type=Path, default=Path("models/demand_forecast_v1.joblib")
+    )
     args = parser.parse_args()
     card = run(args.database, args.output, args.model_output)
     print(json.dumps(asdict(card), indent=2))

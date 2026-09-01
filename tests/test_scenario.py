@@ -43,9 +43,28 @@ class ScenarioTests(unittest.TestCase):
         self.assertIsNone(without_cost.contribution_proxy)
         self.assertAlmostEqual(with_cost.contribution_proxy, 8_000_000)
 
+    def test_higher_competitor_fare_raises_demand_with_positive_cross_effect(self):
+        baseline = simulate(self.base())
+        competitor_increase = simulate(self.base(competitor_fare_change=0.10))
+        self.assertGreater(competitor_increase.passengers, baseline.passengers)
+
+    def test_python_scenario_matches_browser_formula(self):
+        result = simulate(
+            self.base(
+                fare_change=0.03,
+                capacity_change=0.02,
+                competitor_fare_change=-0.04,
+                demand_factor=1.05,
+            )
+        )
+        expected = 80_000 * 1.03**-0.8 * 1.05 * 0.96**0.15
+        self.assertAlmostEqual(result.unconstrained_passengers, expected)
+
     def test_out_of_bounds_change_is_rejected(self):
         with self.assertRaises(ValueError):
             simulate(self.base(fare_change=0.16))
+        with self.assertRaises(ValueError):
+            simulate(self.base(competitor_fare_change=0.11))
 
 
 if __name__ == "__main__":

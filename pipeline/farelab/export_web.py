@@ -11,17 +11,7 @@ import joblib
 import numpy as np
 import pandas as pd
 
-from .forecast import NUMERIC_FEATURES, _boosting_matrix, _to_passengers, load_history
-
-
-def _safe_float(value: Any) -> float | None:
-    if value is None or pd.isna(value) or not np.isfinite(value):
-        return None
-    return float(value)
-
-
-def _period_label(year: int, quarter: int) -> str:
-    return f"{year}Q{quarter}"
+from .forecast import _boosting_matrix, _to_passengers, load_history
 
 
 def _future_frame(history: pd.DataFrame, bundle: dict[str, Any]) -> pd.DataFrame:
@@ -147,8 +137,12 @@ def _balanced_route_sample(frame: pd.DataFrame, maximum_routes: int) -> pd.DataF
     selected = pd.concat(selected_parts, ignore_index=False).drop_duplicates("entity_id")
     if len(selected) < maximum_routes:
         remaining = ranked.loc[~ranked["entity_id"].isin(selected["entity_id"])]
-        selected = pd.concat([selected, remaining.head(maximum_routes - len(selected))], ignore_index=False)
-    return selected.sort_values(["score", "t100_passengers"], ascending=[False, False]).head(maximum_routes)
+        selected = pd.concat(
+            [selected, remaining.head(maximum_routes - len(selected))], ignore_index=False
+        )
+    return selected.sort_values(["score", "t100_passengers"], ascending=[False, False]).head(
+        maximum_routes
+    )
 
 
 def _history_records(frame: pd.DataFrame) -> list[dict[str, Any]]:
@@ -198,8 +192,35 @@ def _quality_summary(database: Path) -> dict[str, Any]:
         sum(case when data_status = 'review' then 1 else 0 end) as review_rows
     from mart_route_carrier_quarter
     """
+    join_query = """
+    with joined as (
+        select
+            fare.service_year,
+            fare.service_quarter,
+            fare.sampled_passengers,
+            traffic.passengers
+        from int_db1b_direct_route_fares fare
+        left join int_t100_route_quarter traffic
+          on fare.service_year = traffic.service_year
+         and fare.service_quarter = traffic.service_quarter
+         and fare.origin_airport_id = traffic.origin_airport_id
+         and fare.destination_airport_id = traffic.destination_airport_id
+         and fare.carrier_code = traffic.carrier_code
+    ), quarterly as (
+        select
+            sum(case when passengers is not null then sampled_passengers else 0 end)
+                / sum(sampled_passengers) as passenger_weighted_join_rate
+        from joined
+        group by service_year, service_quarter
+    )
+    select min(passenger_weighted_join_rate) from quarterly
+    """
     with duckdb.connect(str(database), read_only=True) as connection:
         row = connection.execute(query).fetchone()
+        source_files = connection.execute(
+            "select count(*) from warehouse_source_manifest"
+        ).fetchone()[0]
+        join_rate = connection.execute(join_query).fetchone()[0]
     return {
         "martRows": int(row[0]),
         "directionalRoutes": int(row[1]),
@@ -208,8 +229,8 @@ def _quality_summary(database: Path) -> dict[str, Any]:
         "lastPeriod": str(row[4]),
         "acceptedRows": int(row[5]),
         "reviewRows": int(row[6]),
-        "sourceFiles": 43,
-        "minimumPassengerWeightedJoinRate": 0.9906,
+        "sourceFiles": int(source_files),
+        "minimumPassengerWeightedJoinRate": float(join_rate),
     }
 
 
@@ -227,7 +248,14 @@ def build_artifact(
     future = _future_frame(history, bundle)
     year_ago = history.loc[
         history["period_key"] == "2024Q2",
-        ["entity_id", "weighted_fare_usd", "t100_passengers", "available_seats", "market_share", "load_factor"],
+        [
+            "entity_id",
+            "weighted_fare_usd",
+            "t100_passengers",
+            "available_seats",
+            "market_share",
+            "load_factor",
+        ],
     ].copy()
     year_ago = year_ago.rename(
         columns={
@@ -262,7 +290,9 @@ def build_artifact(
         entity_history = history.loc[history["entity_id"] == row.entity_id].copy()
         observed_fare_min = float(entity_history["weighted_fare_usd"].min())
         observed_fare_max = float(entity_history["weighted_fare_usd"].max())
-        interval_width = (float(row.forecast_high) - float(row.forecast_low)) / float(row.forecast_passengers)
+        interval_width = (float(row.forecast_high) - float(row.forecast_low)) / float(
+            row.forecast_passengers
+        )
         confidence = "High" if len(entity_history) >= 24 and interval_width <= 0.25 else "Medium"
         evidence = [
             f"{len(entity_history)} observed route-carrier quarters",
@@ -322,7 +352,7 @@ def build_artifact(
     share_card = json.loads(share_card_path.read_text(encoding="utf-8"))
     iv_card = json.loads(iv_card_path.read_text(encoding="utf-8"))
     return {
-        "schema_version": "2.0.0",
+        "schema_version": "2.1.0",
         "data_mode": "dot_observed",
         "source_vintage": "DB1B 2017Q1 to 2025Q2 | T-100 2017 to 2025",
         "built_at_utc": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
@@ -337,6 +367,13 @@ def build_artifact(
             "seasonalNaiveWape": forecast_card["aggregate_seasonal_naive"]["wape"],
             "intervalLevel": forecast_card["interval_calibration"]["level"],
             "intervalCoverage": forecast_card["interval_calibration"]["empirical_coverage"],
+            "intervalEvaluationPeriods": forecast_card["interval_calibration"][
+                "evaluation_periods"
+            ],
+            "intervalEvaluationObservations": forecast_card["interval_calibration"]["observations"],
+            "intervalCalibrationObservations": forecast_card["interval_calibration"][
+                "calibration_observations"
+            ],
             "validationObservations": forecast_card["aggregate_gradient_boosting"]["observations"],
         },
         "identificationAudit": {
@@ -366,13 +403,25 @@ def export_artifact(output: Path, **kwargs: Any) -> dict[str, Any]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Export FareLab's production web artifact")
-    parser.add_argument("--database", type=Path, default=Path("data/processed/farelab_panel.duckdb"))
-    parser.add_argument("--model-bundle", type=Path, default=Path("models/demand_forecast_v1.joblib"))
-    parser.add_argument("--forecast-card", type=Path, default=Path("models/demand_forecast_v1.json"))
-    parser.add_argument("--elasticity-card", type=Path, default=Path("models/elasticity_fe_v1.json"))
+    parser.add_argument(
+        "--database", type=Path, default=Path("data/processed/farelab_panel.duckdb")
+    )
+    parser.add_argument(
+        "--model-bundle", type=Path, default=Path("models/demand_forecast_v1.joblib")
+    )
+    parser.add_argument(
+        "--forecast-card", type=Path, default=Path("models/demand_forecast_v1.json")
+    )
+    parser.add_argument(
+        "--elasticity-card", type=Path, default=Path("models/elasticity_fe_v1.json")
+    )
     parser.add_argument("--share-card", type=Path, default=Path("models/market_share_fe_v1.json"))
-    parser.add_argument("--iv-card", type=Path, default=Path("models/elasticity_iv_sensitivity_v1.json"))
-    parser.add_argument("--output", type=Path, default=Path("web/public/data/farelab-overview.json"))
+    parser.add_argument(
+        "--iv-card", type=Path, default=Path("models/elasticity_iv_sensitivity_v1.json")
+    )
+    parser.add_argument(
+        "--output", type=Path, default=Path("web/public/data/farelab-overview.json")
+    )
     parser.add_argument("--maximum-routes", type=int, default=60)
     args = parser.parse_args()
     artifact = export_artifact(

@@ -15,6 +15,8 @@ class ScenarioInput:
     fare_change: float = 0.0
     capacity_change: float = 0.0
     demand_factor: float = 1.0
+    competitor_fare_change: float = 0.0
+    cross_price_elasticity: float = 0.15
     unit_cost: float | None = None
 
 
@@ -41,8 +43,15 @@ def _passenger_response(
     price_ratio: float,
     elasticity: float,
     demand_factor: float,
+    competitor_ratio: float,
+    cross_price_elasticity: float,
 ) -> float:
-    return baseline_passengers * price_ratio**elasticity * demand_factor
+    return (
+        baseline_passengers
+        * price_ratio**elasticity
+        * demand_factor
+        * competitor_ratio**cross_price_elasticity
+    )
 
 
 def _validate(inputs: ScenarioInput) -> None:
@@ -56,6 +65,8 @@ def _validate(inputs: ScenarioInput) -> None:
         inputs.fare_change,
         inputs.capacity_change,
         inputs.demand_factor,
+        inputs.competitor_fare_change,
+        inputs.cross_price_elasticity,
     )
     if not all(isfinite(value) for value in numeric):
         raise ValueError("Scenario inputs must be finite")
@@ -67,10 +78,17 @@ def _validate(inputs: ScenarioInput) -> None:
         raise ValueError("Fare change must be between -15% and 15%")
     if not -0.20 <= inputs.capacity_change <= 0.20:
         raise ValueError("Capacity change must be between -20% and 20%")
+    if not -0.10 <= inputs.competitor_fare_change <= 0.10:
+        raise ValueError("Competitor fare change must be between -10% and 10%")
+    if not -1.0 <= inputs.cross_price_elasticity <= 1.0:
+        raise ValueError("Cross-price elasticity must be between -1 and 1")
     if inputs.demand_factor <= 0:
         raise ValueError("Demand factor must be positive")
-    if inputs.unit_cost is not None and inputs.unit_cost < 0:
-        raise ValueError("Unit cost cannot be negative")
+    if inputs.unit_cost is not None:
+        if not isfinite(inputs.unit_cost):
+            raise ValueError("Unit cost must be finite")
+        if inputs.unit_cost < 0:
+            raise ValueError("Unit cost cannot be negative")
 
 
 def simulate(inputs: ScenarioInput) -> ScenarioOutput:
@@ -83,13 +101,24 @@ def simulate(inputs: ScenarioInput) -> ScenarioOutput:
     proposed_fare = inputs.baseline_fare * (1 + inputs.fare_change)
     seats = inputs.baseline_seats * (1 + inputs.capacity_change)
     price_ratio = proposed_fare / inputs.baseline_fare
+    competitor_ratio = 1 + inputs.competitor_fare_change
 
     center_unconstrained = _passenger_response(
-        inputs.baseline_passengers, price_ratio, inputs.elasticity, inputs.demand_factor
+        inputs.baseline_passengers,
+        price_ratio,
+        inputs.elasticity,
+        inputs.demand_factor,
+        competitor_ratio,
+        inputs.cross_price_elasticity,
     )
     interval_candidates = [
         _passenger_response(
-            inputs.baseline_passengers, price_ratio, estimate, inputs.demand_factor
+            inputs.baseline_passengers,
+            price_ratio,
+            estimate,
+            inputs.demand_factor,
+            competitor_ratio,
+            inputs.cross_price_elasticity,
         )
         for estimate in (inputs.elasticity_low, inputs.elasticity_high)
     ]

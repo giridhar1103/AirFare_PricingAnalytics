@@ -84,6 +84,9 @@ export interface ForecastModelSummary {
   seasonalNaiveWape: number;
   intervalLevel: number;
   intervalCoverage: number;
+  intervalEvaluationPeriods: string[];
+  intervalEvaluationObservations: number;
+  intervalCalibrationObservations: number;
   validationObservations: number;
 }
 

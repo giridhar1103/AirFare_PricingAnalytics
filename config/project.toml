@@ -18,4 +18,4 @@ capacity_change_max = 0.20
 [artifacts]
 maximum_overview_bytes = 500000
 maximum_market_detail_bytes = 1500000
-schema_version = "2.0.0"
+schema_version = "2.1.0"

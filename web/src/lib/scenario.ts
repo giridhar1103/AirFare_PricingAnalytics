@@ -46,6 +46,9 @@ export function simulateScenario(input: ScenarioInput): ScenarioResult {
   if (input.capacityChange < -0.2 || input.capacityChange > 0.2) {
     throw new Error("Capacity change is outside the supported range");
   }
+  if (input.competitorFareChange < -0.1 || input.competitorFareChange > 0.1) {
+    throw new Error("Competitor fare change is outside the supported range");
+  }
   const proposedFare = input.baselineFare * (1 + input.fareChange);
   const priceRatio = proposedFare / input.baselineFare;
   const seats = input.baselineSeats * (1 + input.capacityChange);

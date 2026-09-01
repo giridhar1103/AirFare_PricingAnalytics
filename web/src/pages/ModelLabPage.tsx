@@ -34,7 +34,7 @@ export function ModelLabPage({ artifact }: { artifact: OverviewArtifact }) {
           <span className="section-kicker"><TrendingUp size={17} />Conditional {route.forecast.period} forecast</span>
           <h2>{route.origin} to {route.destination} | {route.carrier}: {formatCompact(route.forecast.passengers)} passengers</h2>
           <p>The calibrated {formatPercent(model.intervalLevel, 0)} interval is {formatCompact(route.forecast.low)} to {formatCompact(route.forecast.high)} passengers. The model assumes the latest fare, seats, competitor fare, and market structure continue into the forecast quarter.</p>
-          <div className="model-alert alert-info"><CheckCircle2 size={18} /><span>Out-of-fold interval coverage is {formatPercent(model.intervalCoverage)} with aggregate forecast bias of {formatPercent(model.bias)}.</span></div>
+          <div className="model-alert alert-info"><CheckCircle2 size={18} /><span>Forward interval coverage is {formatPercent(model.intervalCoverage)} on {model.intervalEvaluationPeriods.join(" and ")}, after calibration on earlier holdout periods. Aggregate forecast bias is {formatPercent(model.bias)}.</span></div>
         </section>
       </div>
 
@@ -61,7 +61,7 @@ export function ModelLabPage({ artifact }: { artifact: OverviewArtifact }) {
       </Panel>
 
       <div className="three-column-grid">
-        <Panel title="Prediction strength" subtitle="What the model demonstrates"><ul className="check-list"><li>5.1% aggregate WAPE</li><li>1.8% aggregate bias</li><li>80.0% calibrated interval coverage</li><li>Large improvement over seasonal naive</li></ul></Panel>
+        <Panel title="Prediction strength" subtitle="What the model demonstrates"><ul className="check-list"><li>{formatPercent(model.wape)} aggregate WAPE</li><li>{formatPercent(model.bias)} aggregate bias</li><li>{formatPercent(model.intervalCoverage)} forward interval coverage</li><li>Large improvement over seasonal naive</li></ul></Panel>
         <Panel title="Known limits" subtitle="What remains unobserved"><ul className="limit-list"><li>Booking-class inventory</li><li>Search and shopping demand</li><li>Schedule quality changes</li><li>Route cost and ancillary revenue</li></ul></Panel>
         <Panel title="Decision policy" subtitle="How model outputs are used"><ul className="check-list"><li>Forecast demand conditional on inputs</li><li>Show uncertainty on every route</li><li>Keep elasticity user supplied</li><li>Never label association as causation</li></ul></Panel>
       </div>
