@@ -72,11 +72,12 @@ No DOT-derived coefficient is used by the scenario simulator. This is a governed
 
 ## Scenario model
 
-Let baseline price and passengers be \(P_0\) and \(Q_0\), proposed fare change be \(d_p\), capacity change be \(d_s\), and analyst-supplied elasticity be \(e\).
+Let baseline price and passengers be \(P_0\) and \(Q_0\), proposed fare change be \(d_p\), capacity change be \(d_s\), analyst-supplied own-price elasticity be \(e\), competitor fare change be \(d_c\), and the governed cross-price assumption be \(e_c\).
 
 ```text
 P1 = P0 * (1 + d_p)
-Q_price = Q0 * (P1 / P0) ^ e
+CompetitorP1 = CompetitorP0 * (1 + d_c)
+Q_price = Q0 * (P1 / P0) ^ e * (CompetitorP1 / CompetitorP0) ^ e_c
 Seats1 = Seats0 * (1 + d_s)
 Q1 = min(Q_price * demand_regime_factor, Seats1)
 Revenue0 = P0 * Q0
@@ -115,7 +116,7 @@ Bias = sum(forecast - actual) / sum(actual)
 Coverage = share(actual within prediction interval)
 ```
 
-Expanding-window holdouts cover 2023, 2024, and the first half of 2025. The gradient boosting champion achieved 5.10% aggregate WAPE and 1.79% bias across 62,792 held-out rows. The seasonal naive baseline produced 15.40% WAPE. An out-of-fold absolute-log-error calibration produces an 80% interval with 80.0% empirical holdout coverage.
+Expanding-window holdouts cover 2023, 2024, and the first half of 2025. The gradient boosting champion achieved 5.10% aggregate WAPE and 1.79% bias across 62,792 held-out rows. The seasonal naive baseline produced 15.40% WAPE. The nominal 80% interval is calibrated from 50,463 absolute-log errors in the 2023 and 2024 folds, then evaluated on the untouched 12,329 observations from 2025 H1. Forward coverage is 74.82%. This shortfall is reported directly instead of evaluating coverage on the same residuals used for calibration.
 
 This remains a conditional forecast. Changing the future fare input does not make the resulting forecast difference causal.
 
@@ -131,3 +132,20 @@ Calendar years 2020 and 2021 are treated as a structural disruption. The default
 - Markets require at least 10,000 quarterly passengers, 3% carrier share, a competitor fare, and complete model inputs to enter the public route set.
 - Optional unit cost is user supplied and clearly separated from observed data.
 - Scenario outputs use assumption-based language, never guaranteed or causal language.
+
+## AI decision brief
+
+The optional decision brief is a communication layer, not a pricing model. The server resolves the route from the published artifact and recomputes the scenario with the canonical Python implementation. Claude receives the governed scenario context and must return a strict tool schema. It may choose only approved evidence and risk keys.
+
+Application code owns the recommendation rule:
+
+```text
+if fare support is extrapolation or revenue proxy declines materially:
+    do not proceed
+else if capacity binds or revenue proxy movement is immaterial:
+    hold for review
+else:
+    run controlled test
+```
+
+The server rejects a generated response if it changes that recommendation, selects unavailable evidence, contains numbers in narrative fields, or makes profit, causal, certainty, or optimization claims. Exact numbers are inserted from deterministic server calculations after generation. The browser labels the result as AI generated and instructs the analyst to review it before use.

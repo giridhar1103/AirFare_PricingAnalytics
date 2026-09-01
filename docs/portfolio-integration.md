@@ -25,7 +25,7 @@ Application link:
 Repository name:
 
 ```text
-farelab-us-airline-pricing
+AirFare_PricingAnalytics
 ```
 
 ## Recommended visual treatment

@@ -1,6 +1,6 @@
 # Claim and source ledger
 
-Research checked on 2026-08-30. Primary sources are preferred for data contracts and implementation choices.
+Research checked on 2026-09-02. Primary sources are preferred for data contracts and implementation choices.
 
 | Claim | Source | Evidence strength | Implementation consequence |
 | --- | --- | --- | --- |
@@ -14,6 +14,8 @@ Research checked on 2026-08-30. Primary sources are preferred for data contracts
 | Airline fare is endogenous to demand and ignoring it can bias elasticity. | [Mumbower, Garrow, and Higgins, 2014](https://doi.org/10.1016/j.tra.2014.05.003) | High, peer-reviewed study | Use observational language and reserve causal claims for a defensible identification design. |
 | Time-ordered validation prevents training on future observations and evaluating on the past. | [scikit-learn TimeSeriesSplit](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.TimeSeriesSplit.html) | High, implementation documentation | Use expanding-window model evaluation. |
 | Histogram gradient boosting is appropriate for larger tabular datasets and supports missing values. | [scikit-learn HistGradientBoostingRegressor](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html) | High, implementation documentation | Use it as the ML challenger after a transparent baseline. |
+| Claude tool definitions can enforce a JSON schema and force a named tool call. | [Anthropic tool-use documentation](https://platform.claude.com/docs/en/agents-and-tools/tool-use/define-tools) | High, official | Restrict the AI brief to approved fields and evidence keys. |
+| LLM evaluation criteria should be specific, measurable, and tested against representative edge cases. | [Anthropic evaluation documentation](https://platform.claude.com/docs/en/test-and-evaluate/develop-tests) | High, official | Grade recommendation policy, grounding, prohibited claims, schema, and latency. |
 | A useful dashboard provides a quick overview and coordinated drill-down without overwhelming the user. | [Observable dashboard guidance](https://observablehq.com/blog/seven-ways-design-better-dashboards) | Medium, expert guidance | Lead with an action queue and keep filters compact. |
 | Dashboard hierarchy should put important content first and use linked views and whitespace. | [IBM Carbon dashboard guidance](https://carbondesignsystem.com/data-visualization/dashboards/) | Medium, design-system guidance | Use sparse KPIs, strong hierarchy, consistent colors, and linked evidence. |
 
@@ -25,4 +27,4 @@ Research checked on 2026-08-30. Primary sources are preferred for data contracts
 | Join coverage between DB1B and T-100 | 99.78% passenger-weighted in the 2024 Q4 direct-route spike when using operating carrier | V1 further restricts to aligned reporting, ticketing, and operating carrier records. |
 | Defensible instrument for causal fare elasticity | Not established | All initial elasticity language remains observational. |
 | Route-level cost and ancillary revenue | Not available in selected public sources | No historical profit optimization. Optional cost stays user supplied. |
-| Prediction interval calibration across thin markets | Pending real-data backtest | Thin routes remain unranked until calibration is acceptable. |
+| Prediction interval calibration across thin markets | Nominal 80% interval achieved 74.82% coverage on the untouched 2025 H1 evaluation period | Report the miss, keep the interval descriptive, and add segment-level calibration before operational use. |

@@ -63,9 +63,12 @@ export function AppShell({ children, isFixture, sourceVintage }: AppShellProps) 
               <NavigationLink key={to} to={to} label={label} icon={Icon} onNavigate={() => setMobileOpen(false)} />
             ))}
           </nav>
-          <div className="sidebar-note">
-            <span className="sidebar-note-label">Model boundary</span>
-            <p>Decision support for route reviews. Not a live fare filing or inventory system.</p>
+          <div className="sidebar-footer">
+            <div className="sidebar-note">
+              <span className="sidebar-note-label">Model boundary</span>
+              <p>Decision support for route reviews. Not a live fare filing or inventory system.</p>
+            </div>
+            <p className="project-credit">Designed and built by<br/><strong>Giridhar Achuthananda</strong></p>
           </div>
         </aside>
         <main id="main-content" className="main-content">{children}</main>
