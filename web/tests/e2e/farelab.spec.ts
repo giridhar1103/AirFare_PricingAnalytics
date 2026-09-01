@@ -47,6 +47,47 @@ test("updates scenario math from feasible inputs", async ({ page }) => {
   await expect(page.getByText("Revenue proxy change")).toBeVisible();
 });
 
+test("generates a grounded decision brief without changing scenario math", async ({ page }) => {
+  await page.route("https://api.giriworks.com/farelab-ai/brief", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        routeId: "11433:13342:DL",
+        provider: "Anthropic",
+        model: "claude-haiku-4-5-20251001",
+        generatedAtUtc: "2026-09-02T00:00:00Z",
+        generationMode: "ai",
+        calculationSource: "FareLab server calculation using governed scenario equations",
+        support: "Within observed range",
+        scenario: {},
+        brief: {
+          recommendation: "Run controlled test",
+          headline: "Supported fare adjustment is suitable for a controlled test",
+          summary: "The scenario remains within observed support and warrants a measured market test.",
+          evidence: [
+            "Proposed fare remains within the observed range.",
+            "Revenue proxy moves higher under the supplied assumptions."
+          ],
+          risks: [
+            "Elasticity is analyst supplied.",
+            "Revenue proxy excludes route accounting cost."
+          ],
+          nextStep: "Define a test cell and rollback criteria before implementation."
+        }
+      })
+    });
+  });
+  await page.goto("scenario");
+  const revenueBefore = await page.locator(".decision-change").textContent();
+  await page.getByRole("button", { name: "Generate decision brief" }).click();
+  await expect(page.getByText("Run controlled test", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Supported fare adjustment is suitable for a controlled test" })).toBeVisible();
+  await expect(page.getByText(/AI-generated narrative from Anthropic/)).toBeVisible();
+  const revenueAfter = await page.locator(".decision-change").textContent();
+  expect(revenueAfter).toBe(revenueBefore);
+});
+
 test("does not overflow the viewport", async ({ page }) => {
   const viewport = page.viewportSize();
   const layout = await page.evaluate(() => {

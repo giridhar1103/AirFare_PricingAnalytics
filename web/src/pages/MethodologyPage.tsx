@@ -1,4 +1,4 @@
-import { Database, GitBranch, ShieldCheck, TrendingUp } from "lucide-react";
+import { Database, GitBranch, ShieldCheck, Sparkles, TrendingUp } from "lucide-react";
 import { PageHeader } from "../components/PageHeader";
 import { Panel } from "../components/Panel";
 import type { OverviewArtifact } from "../data/types";
@@ -35,7 +35,7 @@ export function MethodologyPage({ artifact }: { artifact: OverviewArtifact }) {
         <Panel title="Scenario equations" subtitle="Constant-elasticity arithmetic with an explicit seat constraint">
           <div className="formula-stack">
             <code>P1 = P0 x (1 + fare change)</code>
-            <code>Q demand = Q0 x (P1 / P0) ^ elasticity</code>
+            <code>Q demand = Q0 x (P1 / P0) ^ elasticity x (CompP1 / CompP0) ^ cross elasticity</code>
             <code>Q1 = min(Q demand x regime factor, Seats1)</code>
             <code>Revenue proxy = P1 x Q1</code>
             <code>Load factor = Q1 / Seats1</code>
@@ -49,7 +49,7 @@ export function MethodologyPage({ artifact }: { artifact: OverviewArtifact }) {
             <div><dt>Bias</dt><dd>Signed aggregate over-forecast or under-forecast</dd></div>
             <div><dt>Coverage</dt><dd>Share of actuals inside the prediction interval</dd></div>
           </dl>
-          <p className="formula-note">Expanding time windows prevent the model from training on future periods. The champion WAPE is {formatPercent(model.wape)}, compared with {formatPercent(model.seasonalNaiveWape)} for the seasonal naive baseline across {formatCompact(model.validationObservations)} held-out rows. ML is a conditional demand forecast, not an automatic fare setter.</p>
+          <p className="formula-note">Expanding time windows prevent the model from training on future periods. Interval width is calibrated on {formatCompact(model.intervalCalibrationObservations)} observations from the 2023 and 2024 folds, then checked on {formatCompact(model.intervalEvaluationObservations)} observations from {model.intervalEvaluationPeriods.join(" and ")}. The champion WAPE is {formatPercent(model.wape)}, compared with {formatPercent(model.seasonalNaiveWape)} for the seasonal naive baseline across {formatCompact(model.validationObservations)} held-out rows. ML is a conditional demand forecast, not an automatic fare setter.</p>
         </Panel>
       </div>
 
@@ -61,6 +61,16 @@ export function MethodologyPage({ artifact }: { artifact: OverviewArtifact }) {
           <article><span>IV sensitivity</span><strong>{audit.ivSensitivityCoefficient.toFixed(3)}</strong><small>Nonnegative second stage</small><b>Research only</b></article>
         </div>
         <p className="audit-explanation">Quarterly public data does not observe the private demand signals airlines use when changing fares and capacity. FareLab therefore does not use any of these coefficients as causal elasticity. The simulator requires an explicit analyst assumption instead.</p>
+      </Panel>
+
+      <Panel title="AI decision brief" subtitle="A narrative layer with hard boundaries around the analytical result">
+        <div className="ai-method-grid">
+          <article><span>01</span><div><strong>Server calculation</strong><p>The API reloads the published route record and recomputes the scenario with the same tested Python equations.</p></div></article>
+          <article><span>02</span><div><strong>Structured generation</strong><p>Claude returns a fixed schema containing a headline, approved evidence keys, approved risk keys, and a next step.</p></div></article>
+          <article><span>03</span><div><strong>Policy validation</strong><p>The server rejects changed recommendations, unsupported evidence, numbers in generated prose, and profit or causal claims.</p></div></article>
+          <article><Sparkles size={18}/><div><strong>Human review</strong><p>The output is labeled AI-generated and remains a draft. It cannot publish a fare, change inventory, or replace analyst approval.</p></div></article>
+        </div>
+        <p className="formula-note">Evaluation cases cover supported changes, extrapolation, capacity constraints, competitor response, optional cost, schema validity, and prohibited claims. Exact calculations remain outside the language model.</p>
       </Panel>
 
       <Panel title="Model risk register" subtitle="Known gaps remain visible instead of being filled with invented data">
@@ -78,6 +88,7 @@ export function MethodologyPage({ artifact }: { artifact: OverviewArtifact }) {
         <a href="https://www.transtats.bts.gov/DatabaseInfo.asp?QO_VQ=EEE" target="_blank" rel="noreferrer"><span>U.S. DOT</span><strong>T-100 database profile</strong><small>Traffic, capacity, coverage, and terms</small></a>
         <a href="https://www.bts.gov/air-fares" target="_blank" rel="noreferrer"><span>U.S. DOT</span><strong>Air fare definitions</strong><small>Ticket value and exclusions</small></a>
         <a href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.TimeSeriesSplit.html" target="_blank" rel="noreferrer"><span>scikit-learn</span><strong>Time-ordered validation</strong><small>Forecast split implementation reference</small></a>
+        <a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/define-tools" target="_blank" rel="noreferrer"><span>Anthropic</span><strong>Structured tool output</strong><small>Strict schema and forced tool reference</small></a>
       </div></section>
     </div>
   );

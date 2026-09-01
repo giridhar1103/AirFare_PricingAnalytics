@@ -1,0 +1,50 @@
+[
+  {
+    "id": "supported_increase",
+    "request": {"routeId": "11433:13342:DL", "fareChange": 0.03, "capacityChange": 0.0, "competitorFareChange": 0.0, "elasticity": -0.8, "demandFactor": 1.0},
+    "expectedRecommendation": "Run controlled test",
+    "expectedSupport": "Within observed range"
+  },
+  {
+    "id": "neutral_hold",
+    "request": {"routeId": "11433:13342:DL", "fareChange": 0.0, "capacityChange": 0.0, "competitorFareChange": 0.0, "elasticity": -1.0, "demandFactor": 1.0},
+    "expectedRecommendation": "Hold for review",
+    "expectedSupport": "Within observed range"
+  },
+  {
+    "id": "negative_revenue",
+    "request": {"routeId": "11433:13342:DL", "fareChange": 0.1, "capacityChange": 0.0, "competitorFareChange": 0.0, "elasticity": -2.0, "demandFactor": 1.0},
+    "expectedRecommendation": "Do not proceed",
+    "expectedSupport": "Extrapolation"
+  },
+  {
+    "id": "fare_extrapolation",
+    "request": {"routeId": "10397:12478:DL", "fareChange": 0.15, "capacityChange": 0.0, "competitorFareChange": 0.0, "elasticity": -0.8, "demandFactor": 1.0},
+    "expectedRecommendation": "Do not proceed",
+    "expectedSupport": "Extrapolation"
+  },
+  {
+    "id": "capacity_bind",
+    "request": {"routeId": "14635:13487:SY", "fareChange": 0.03, "capacityChange": -0.02, "competitorFareChange": 0.0, "elasticity": -0.8, "demandFactor": 1.05},
+    "expectedRecommendation": "Hold for review",
+    "expectedSupport": "Within observed range"
+  },
+  {
+    "id": "competitor_increase",
+    "request": {"routeId": "14122:13487:DL", "fareChange": 0.02, "capacityChange": 0.05, "competitorFareChange": 0.08, "elasticity": -0.9, "demandFactor": 1.0},
+    "expectedRecommendation": "Run controlled test",
+    "expectedSupport": "Within observed range"
+  },
+  {
+    "id": "soft_demand",
+    "request": {"routeId": "14122:15304:WN", "fareChange": 0.02, "capacityChange": 0.0, "competitorFareChange": -0.05, "elasticity": -1.3, "demandFactor": 0.95},
+    "expectedRecommendation": "Do not proceed",
+    "expectedSupport": "Within observed range"
+  },
+  {
+    "id": "analyst_cost",
+    "request": {"routeId": "13342:11433:DL", "fareChange": 0.04, "capacityChange": 0.02, "competitorFareChange": 0.0, "elasticity": -0.7, "demandFactor": 1.0, "unitCost": 180.0},
+    "expectedRecommendation": "Run controlled test",
+    "expectedSupport": "Within observed range"
+  }
+]

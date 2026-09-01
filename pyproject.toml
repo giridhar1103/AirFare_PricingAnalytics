@@ -7,6 +7,7 @@ name = "farelab"
 version = "0.1.0"
 description = "U.S. airline route pricing and revenue analytics pipeline"
 readme = "README.md"
+authors = [{ name = "Giridhar Achuthananda" }]
 requires-python = ">=3.11"
 dependencies = [
   "duckdb>=1.4,<2",
@@ -19,6 +20,12 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+api = [
+  "anthropic>=0.97,<1",
+  "fastapi>=0.116,<1",
+  "pydantic>=2.11,<3",
+  "uvicorn[standard]>=0.35,<1",
+]
 dev = [
   "pytest>=8,<9",
   "ruff>=0.11,<1",

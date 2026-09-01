@@ -1,0 +1,117 @@
+{
+  "evaluatedAtUtc": "2026-09-01T22:16:22.878390Z",
+  "mode": "live",
+  "cases": 8,
+  "passed": 8,
+  "passRate": 1.0,
+  "results": [
+    {
+      "id": "supported_increase",
+      "passed": true,
+      "checks": {
+        "deterministicRecommendation": true,
+        "supportClassification": true,
+        "liveResponse": true,
+        "responseRecommendation": true,
+        "prohibitedNarrative": true,
+        "groundedEvidence": true,
+        "groundedRisks": true
+      }
+    },
+    {
+      "id": "neutral_hold",
+      "passed": true,
+      "checks": {
+        "deterministicRecommendation": true,
+        "supportClassification": true,
+        "liveResponse": true,
+        "responseRecommendation": true,
+        "prohibitedNarrative": true,
+        "groundedEvidence": true,
+        "groundedRisks": true
+      }
+    },
+    {
+      "id": "negative_revenue",
+      "passed": true,
+      "checks": {
+        "deterministicRecommendation": true,
+        "supportClassification": true,
+        "liveResponse": true,
+        "responseRecommendation": true,
+        "prohibitedNarrative": true,
+        "groundedEvidence": true,
+        "groundedRisks": true
+      }
+    },
+    {
+      "id": "fare_extrapolation",
+      "passed": true,
+      "checks": {
+        "deterministicRecommendation": true,
+        "supportClassification": true,
+        "liveResponse": true,
+        "responseRecommendation": true,
+        "prohibitedNarrative": true,
+        "groundedEvidence": true,
+        "groundedRisks": true
+      }
+    },
+    {
+      "id": "capacity_bind",
+      "passed": true,
+      "checks": {
+        "deterministicRecommendation": true,
+        "supportClassification": true,
+        "liveResponse": true,
+        "responseRecommendation": true,
+        "prohibitedNarrative": true,
+        "groundedEvidence": true,
+        "groundedRisks": true
+      }
+    },
+    {
+      "id": "competitor_increase",
+      "passed": true,
+      "checks": {
+        "deterministicRecommendation": true,
+        "supportClassification": true,
+        "liveResponse": true,
+        "responseRecommendation": true,
+        "prohibitedNarrative": true,
+        "groundedEvidence": true,
+        "groundedRisks": true
+      }
+    },
+    {
+      "id": "soft_demand",
+      "passed": true,
+      "checks": {
+        "deterministicRecommendation": true,
+        "supportClassification": true,
+        "liveResponse": true,
+        "responseRecommendation": true,
+        "prohibitedNarrative": true,
+        "groundedEvidence": true,
+        "groundedRisks": true
+      }
+    },
+    {
+      "id": "analyst_cost",
+      "passed": true,
+      "checks": {
+        "deterministicRecommendation": true,
+        "supportClassification": true,
+        "liveResponse": true,
+        "responseRecommendation": true,
+        "prohibitedNarrative": true,
+        "groundedEvidence": true,
+        "groundedRisks": true
+      }
+    }
+  ],
+  "latencySeconds": {
+    "median": 2.7679934334009886,
+    "p95": 5.540377404540777
+  }
+}

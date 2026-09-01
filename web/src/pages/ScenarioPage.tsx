@@ -15,6 +15,7 @@ import {
 import { PageHeader } from "../components/PageHeader";
 import { Panel } from "../components/Panel";
 import { RangeControl } from "../components/RangeControl";
+import { AiDecisionBrief } from "../components/AiDecisionBrief";
 import type { RouteMarket } from "../data/types";
 import { formatCompact, formatCurrency, formatPercent, signedPercent } from "../lib/format";
 import { simulateScenario, supportLabel } from "../lib/scenario";
@@ -64,8 +65,8 @@ export function ScenarioPage({ routes }: { routes: RouteMarket[] }) {
         : "Revenue proxy decreases under this assumption";
 
   const comparisonData = [
-    { name: "Passengers", baseline: route.passengers, scenario: result.passengers },
-    { name: "Revenue proxy", baseline: result.baselineRevenue / 100, scenario: result.revenue / 100 }
+    { name: "Passengers", baseline: 100, scenario: result.passengers / route.passengers * 100 },
+    { name: "Revenue proxy", baseline: 100, scenario: result.revenue / result.baselineRevenue * 100 }
   ];
 
   const changeMarket = (id: string) => {
@@ -123,9 +124,9 @@ export function ScenarioPage({ routes }: { routes: RouteMarket[] }) {
           </section>
 
           <div className="two-column-grid scenario-detail-grid">
-            <Panel title="Baseline versus scenario" subtitle="Revenue proxy is scaled to compare with passenger volume">
-              <div className="scenario-chart" role="img" aria-label="Comparison of baseline and scenario passengers and revenue proxy">
-                <ResponsiveContainer width="100%" height="100%"><BarChart data={comparisonData} barGap={6}><CartesianGrid stroke="#e7edf1" vertical={false}/><XAxis dataKey="name" tick={{ fill: "#566773", fontSize: 12 }} tickLine={false} axisLine={false}/><YAxis tickFormatter={formatCompact} tick={{ fill: "#566773", fontSize: 12 }} tickLine={false} axisLine={false}/><Tooltip formatter={(value: number) => formatCompact(value)} contentStyle={{ border: "1px solid #dce5ea", borderRadius: 8 }}/><ReferenceLine y={0} stroke="#9aa8b4"/><Bar dataKey="baseline" name="Baseline" fill="#c4d0d9" radius={[4,4,0,0]}/><Bar dataKey="scenario" name="Scenario" radius={[4,4,0,0]}>{comparisonData.map((item) => <Cell key={item.name} fill={positive ? "#087f8c" : "#d18a12"}/>)}</Bar></BarChart></ResponsiveContainer>
+            <Panel title="Baseline versus scenario" subtitle="Both measures are indexed to baseline = 100">
+              <div className="scenario-chart" role="img" aria-label="Indexed comparison of baseline and scenario passengers and revenue proxy">
+                <ResponsiveContainer width="100%" height="100%"><BarChart data={comparisonData} barGap={6}><CartesianGrid stroke="#e7edf1" vertical={false}/><XAxis dataKey="name" tick={{ fill: "#566773", fontSize: 12 }} tickLine={false} axisLine={false}/><YAxis tickFormatter={(value) => value.toFixed(0)} domain={["auto", "auto"]} tick={{ fill: "#566773", fontSize: 12 }} tickLine={false} axisLine={false}/><Tooltip formatter={(value: number) => `${value.toFixed(1)} index points`} contentStyle={{ border: "1px solid #dce5ea", borderRadius: 8 }}/><ReferenceLine y={100} stroke="#9aa8b4" strokeDasharray="4 4"/><Bar dataKey="baseline" name="Baseline" fill="#c4d0d9" radius={[4,4,0,0]}/><Bar dataKey="scenario" name="Scenario" radius={[4,4,0,0]}>{comparisonData.map((item) => <Cell key={item.name} fill={positive ? "#087f8c" : "#d18a12"}/>)}</Bar></BarChart></ResponsiveContainer>
               </div>
             </Panel>
             <Panel title="Why this result" subtitle="Calculation trail for analyst review">
@@ -139,6 +140,16 @@ export function ScenarioPage({ routes }: { routes: RouteMarket[] }) {
               </dl>
             </Panel>
           </div>
+
+          <AiDecisionBrief request={{
+            routeId: route.id,
+            fareChange: fareChange / 100,
+            capacityChange: capacityChange / 100,
+            competitorFareChange: competitorChange / 100,
+            elasticity: elasticityAssumption,
+            demandFactor: demandFactors[demandRegime],
+            unitCost: costEnabled ? unitCost : undefined
+          }} />
 
           <div className="assumption-note"><AlertTriangle size={17}/><p><strong>Interpretation boundary:</strong> This is scenario arithmetic, not a causal forecast or automated fare recommendation. Elasticity and competitor response are analyst assumptions. Revenue proxy excludes optional-service revenue and accounting cost. Capacity changes do not model schedule feasibility.</p></div>
         </div>

@@ -1,0 +1,28 @@
+[Unit]
+Description=FareLab grounded decision brief API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/AirFare_PricingAnalytics
+EnvironmentFile=/etc/farelab-ai.env
+Environment=FARELAB_AI_MODEL=claude-haiku-4-5-20251001
+Environment=FARELAB_FRONTEND_ORIGINS=https://giriworks.com
+ExecStart=/root/AirFare_PricingAnalytics/.venv-api/bin/uvicorn api.app:app --host 127.0.0.1 --port 8010 --proxy-headers --forwarded-allow-ips=127.0.0.1
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=20
+KillSignal=SIGINT
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=read-only
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+LockPersonality=true
+
+[Install]
+WantedBy=multi-user.target
