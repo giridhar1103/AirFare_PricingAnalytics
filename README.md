@@ -4,6 +4,9 @@
 
 [Live application](https://giriworks.com/farelab/) | [GitHub repository](https://github.com/giridhar1103/AirFare_PricingAnalytics) | [Giridhar's portfolio](https://giriworks.com/)
 
+<img width="1903" height="928" alt="image" src="https://github.com/user-attachments/assets/8133e10f-fbb2-4fa4-9355-9f478ce31e4f" />
+
+
 FareLab is an interactive pricing analytics application built from public U.S. Department of Transportation data. It helps an analyst identify route-level review opportunities, inspect the supporting market evidence, test fare and capacity assumptions, and produce a governed decision brief.
 
 The project combines analytical engineering, forecasting, econometrics, scenario mathematics, model governance, a React decision interface, and an optional AI communication layer. It is designed for U.S. pricing, revenue management analytics, and commercial analytics roles.
